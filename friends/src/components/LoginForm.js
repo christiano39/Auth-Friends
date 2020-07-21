@@ -27,14 +27,12 @@ const LoginForm = () => {
         axios
             .post('http://localhost:5000/api/login', formValues)
             .then(res => {
-                console.log(res);
                 setIsLoading(false);
                 setError('');
                 localStorage.setItem('token', res.data.payload);
                 history.push('/friends');
             })
             .catch(err => {
-                console.log(err.response);
                 setIsLoading(false);
                 setError(err.response.data.error)
             })

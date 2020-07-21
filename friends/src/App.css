@@ -5,3 +5,15 @@
 .error {
   color: red;
 }
+
+.friend {
+  border: 2px solid grey;
+  margin: 20px auto;
+  width: 300px;
+}
+
+.friends-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
