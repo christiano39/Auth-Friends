@@ -13,6 +13,7 @@ const Friends = () => {
     const [error, setError] = useState('');
     const [friends, setFriends] = useState([]);
     const [formValues, setFormValues] = useState(initialFormValues);
+    const [isEditing, setIsEditing] = useState(false);
 
     const addFriend = friend => {
         axiosWithAuth()
@@ -23,6 +24,36 @@ const Friends = () => {
             .catch(err => {
                 setError(err.response.data.error)
             });
+    }
+
+    const deleteFriend = friendId => {
+        axiosWithAuth()
+            .delete(`/api/friends/${friendId}`)
+            .then(res => {
+                setFriends(res.data);
+            })
+    }
+
+    const editFriend = friend => {
+        axiosWithAuth()
+            .put(`/api/friends/${friend.id}`, friend)
+            .then(res => {
+                setFriends(res.data);
+                setIsEditing(false);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
+    const populateEditForm = friend => {
+        setIsEditing(true);
+        setFormValues(friend);
+    }
+
+    const cancelEdit = () => {
+        setFormValues(initialFormValues);
+        setIsEditing(false);
     }
     
     const handleInputChange = e => {
@@ -35,7 +66,7 @@ const Friends = () => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        addFriend(formValues);
+        !isEditing ? addFriend(formValues) : editFriend(formValues);
         setFormValues(initialFormValues);
     }
 
@@ -65,12 +96,16 @@ const Friends = () => {
                             <p>{friend.name}</p>
                             <p>Age: {friend.age}</p>
                             <p>{friend.email}</p>
+                            <div className='buttons'>
+                                <button onClick={() => deleteFriend(friend.id)}>Delete</button>
+                                <button onClick={() => populateEditForm(friend)}>Edit</button>
+                            </div>
                         </div>
                     )
                 })}
             </div>
             <form onSubmit={handleSubmit}>
-                <h2>Add a friend</h2>
+                {!isEditing ? <h2>Add a friend</h2> : <h2>Edit friend</h2>}
                 <label htmlFor='name'>Name:&nbsp;</label>
                 <input 
                     type='text'
@@ -98,8 +133,10 @@ const Friends = () => {
                     onChange={handleInputChange}
                 />
                 <br/><br/>
-                <button>Add friend</button>
+                <button>{isEditing ? 'Submit edit' : 'Add friend'}</button>&nbsp;
+                {isEditing && <button onClick={cancelEdit}>Cancel</button>}
             </form>
+            
         </div>
     )
 }
